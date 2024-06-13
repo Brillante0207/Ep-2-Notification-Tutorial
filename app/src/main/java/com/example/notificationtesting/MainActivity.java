@@ -6,14 +6,23 @@ import android.app.NotificationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.Firebase;
+import com.google.firebase.iid.FirebaseInstanceIdReceiver;
+import com.google.firebase.iid.internal.FirebaseInstanceIdInternal;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -25,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
     private  static  final String ChannerID = "Anthony";
     private  static  final String ChannerName = "Brillante";
     private  static  final String ChannerDesc = "Notification";
+
+    private TextView textView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,14 +55,34 @@ public class MainActivity extends AppCompatActivity {
             manager.createNotificationChannel(channel);
         }
 
+        textView = findViewById(R.id.TextViewToken);
+
+        //This code is getting the notification Token
+        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(new OnCompleteListener<String>() {
+            @Override
+            public void onComplete(@NonNull Task<String> task) {
+                //inside this token get the notification token
+                if(task.isSuccessful()){
+                    //if task is successfully get the registration token
+                    String token =  task.getResult();
+                    textView.setText("Token: " + token);
+                }else{
+                    textView.setText("Token not generated");
+                    textView.setText(task.getException().getMessage());
+                }
+            }
+        });
+
+
         //This button is use for trigger for display the notification
+        /*
         findViewById(R.id.NotificationButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 displayNotification();
             }
         });
-
+        */
     }
     //this function will display the notification
     @SuppressLint("MissingPermission")
